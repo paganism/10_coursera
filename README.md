@@ -1,6 +1,16 @@
 # Coursera Dump
 
-[TODO. There will be project description]
+This module collects data of courses on coursera.org and saves it to file, which user point as filepath  
+
+# Usage example
+
+```bash
+$ python3 coursera.py filepath
+
+filepath - path to your file
+
+```
+
 
 # Project Goals
 
