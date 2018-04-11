@@ -6,13 +6,15 @@ import argparse
 
 
 def get_courses_list():
-    xml = requests.get("https://www.coursera.org/sitemap~www~courses.xml").content
+    xml = requests.get(
+        "https://www.coursera.org/sitemap~www~courses.xml"
+    ).content
     root = etree.fromstring(xml)
     url_list = []
     for element in root.getchildren():
         for i in element.getchildren():
             url_list.append(i.text)
-    return url_list[:100]
+    return url_list[:10]
 
 
 def get_course_info(course):
@@ -28,7 +30,9 @@ def get_course_info(course):
     except IndexError:
         course_info.append("No Lang yet")
     try:
-        course_info.append(soup.find_all('div', 'rc-StartDateString')[0].get_text())
+        course_info.append(soup.find_all(
+            'div', 'rc-StartDateString'
+        )[0].get_text())
     except IndexError:
         course_info.append("No Date yet")
     try:
@@ -67,4 +71,3 @@ if __name__ == "__main__":
         info = get_course_info(each_course)
         course_list.append(info)
     output_courses_info_to_xlsx(course_list, filepath)
-
