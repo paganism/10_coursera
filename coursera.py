@@ -3,9 +3,10 @@ from lxml import etree
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 import argparse
+import os
 
 
-def get_courses_list():
+def get_courses_list(record_count):
     xml = requests.get(
         "https://www.coursera.org/sitemap~www~courses.xml"
     ).content
@@ -14,7 +15,7 @@ def get_courses_list():
     for element in root.getchildren():
         for i in element.getchildren():
             url_list.append(i.text)
-    return url_list[:10]
+    return url_list[:record_count]
 
 
 def get_course_info(course):
@@ -60,13 +61,23 @@ def output_courses_info_to_xlsx(course_info, filepath):
     wb.save(filepath)
 
 
-if __name__ == "__main__":
-    url_list = get_courses_list()
-    course_list = []
+def parse_argument():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=str, help='path to file')
-    args = parser.parse_args()
-    filepath = args.path
+    parser.add_argument(
+        '--path',
+        dest='path',
+        required=True,
+        help='Path to file'
+    )
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    record_count = 20
+    url_list = get_courses_list(record_count)
+    course_list = []
+    arg = parse_argument()
+    filepath = arg.path
     for each_course in url_list:
         info = get_course_info(each_course)
         course_list.append(info)

@@ -5,9 +5,9 @@ This module collects data of courses on coursera.org and saves it to file, which
 # Usage example
 
 ```bash
-$ python3 coursera.py filepath
+$ python3 coursera.py --path filepath
 
-filepath - path to your file
+--path required option set path to your file
 
 ```
 
