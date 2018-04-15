@@ -13,8 +13,8 @@ def get_courses_list(record_count):
     root = etree.fromstring(xml)
     url_list = []
     for element in root.getchildren():
-        for i in element.getchildren():
-            url_list.append(i.text)
+        for child in element.getchildren():
+            url_list.append(child.text)
     return url_list[:record_count]
 
 
@@ -24,30 +24,18 @@ def get_course_info(course):
     soup = BeautifulSoup(html_content, 'html.parser')
     try:
         course_info.append(soup.find_all('h2')[0].get_text())
-    except IndexError:
-        course_info.append("No name yet")
-    try:
         course_info.append(soup.find_all('div', 'rc-Language')[0].get_text())
-    except IndexError:
-        course_info.append("No Lang yet")
-    try:
         course_info.append(soup.find_all(
             'div', 'rc-StartDateString'
         )[0].get_text())
-    except IndexError:
-        course_info.append("No Date yet")
-    try:
         course_info.append(soup.find_all('div', 'rc-BasicInfo')[0].get_text())
-    except:
-        course_info.append("No Info yet")
-    try:
         course_info.append(soup.find_all('div', 'ratings-text')[0].get_text())
     except IndexError:
-        course_info.append("No rating yet")
+        course_info.append("No data yet")
     return course_info
 
 
-def output_courses_info_to_xlsx(course_info, filepath):
+def output_courses_info_to_xlsx(course_list, filepath):
     wb = Workbook()
     ws = wb.active
     ws.title = 'Coursera courses info'
@@ -56,8 +44,8 @@ def output_courses_info_to_xlsx(course_info, filepath):
     ws['C1'] = 'Start Date'
     ws['D1'] = 'Continouation'
     ws['E1'] = 'Rating'
-    for each in course_info:
-        ws.append(each)
+    for course in course_list:
+        ws.append(course)
     wb.save(filepath)
 
 
@@ -79,6 +67,6 @@ if __name__ == "__main__":
     arg = parse_argument()
     filepath = arg.path
     for each_course in url_list:
-        info = get_course_info(each_course)
-        course_list.append(info)
+        course_info = get_course_info(each_course)
+        course_list.append(course_info)
     output_courses_info_to_xlsx(course_list, filepath)
