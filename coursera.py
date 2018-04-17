@@ -3,7 +3,6 @@ from lxml import etree
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 import argparse
-import os
 
 
 def get_courses_link_list(xml_content, record_count):
@@ -15,7 +14,7 @@ def get_courses_link_list(xml_content, record_count):
     return url_list[:record_count]
 
 
-def get_content(link):
+def fetch_content(link):
     response = requests.get(link).content
     return response
 
@@ -23,27 +22,26 @@ def get_content(link):
 def get_course_inform(html_content, course):
     soup = BeautifulSoup(html_content, 'html.parser')
     course_inform = dict(
-        course_title=soup.find_all('h2')[0].get_text(),
-        language=soup.find_all(
+        course_title=soup.find('h2').get_text(),
+        language=soup.find(
             'div',
-            'rc-Language'
-        )[0].get_text(),
-        start_date=soup.find_all(
+            class_='rc-Language'
+        ).get_text(),
+        start_date=soup.find(
             'div',
-            'rc-StartDateString'
-        )[0].get_text(),
-        continuation=soup.find_all(
+            class_='startdate rc-StartDateString caption-text'
+        ).get_text(),
+        continuation=len(soup.findAll(
             'div',
-            'rc-BasicInfo'
-        )[0].get_text(),
+            class_='week')),
         rating=None
     )
-    rating = soup.find_all(
+    rating = soup.find(
         'div',
-        'ratings-text headline-2-text'
+        class_='ratings-text headline-2-text'
     )
     if rating:
-        course_inform['rating'] = rating[0].getText()
+        course_inform['rating'] = rating.getText()
     return course_inform
 
 
@@ -81,15 +79,15 @@ def parse_argument():
 
 
 if __name__ == '__main__':
-    record_count = 20
+    record_count = 2
     link = 'https://www.coursera.org/sitemap~www~courses.xml'
-    xml_content = get_content(link)
+    xml_content = fetch_content(link)
     url_list = get_courses_link_list(xml_content, record_count)
     course_list = []
     arg = parse_argument()
     filepath = arg.path
     for url in url_list:
-        html_content = get_content(url)
+        html_content = fetch_content(url)
         course_info = get_course_inform(html_content, url)
         course_list.append(course_info)
     wb = Workbook()
