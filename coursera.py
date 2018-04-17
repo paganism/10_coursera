@@ -3,6 +3,7 @@ from lxml import etree
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 import argparse
+import os
 
 
 def get_courses_link_list(xml_content, record_count):
